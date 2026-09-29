@@ -1,9 +1,9 @@
 """
-Seed script for the Music Disc Loan System.
+Seed script for the Sistema de Renta de Discos.
 
-Run this AFTER your backend is up (uvicorn or docker compose), so it can
+Run this AFTER your backend is up (docker compose up --build), so it can
 POST data through the real API — this exercises schemas, services, and
-repositories exactly like the frontend will, instead of writing to Mongo
+repositories exactly like Angular will, instead of writing to Mongo
 directly and skipping your business logic.
 
 Usage:
@@ -15,64 +15,78 @@ import requests
 
 BASE_URL = "http://localhost:8000"
 
-discs = [
-    {"title": "Abbey Road", "artist": "The Beatles", "genre": "Rock", "format": "Vinyl", "total_copies": 3},
-    {"title": "Thriller", "artist": "Michael Jackson", "genre": "Pop", "format": "CD", "total_copies": 5},
-    {"title": "Rumours", "artist": "Fleetwood Mac", "genre": "Rock", "format": "Vinyl", "total_copies": 2},
-    {"title": "Back to Black", "artist": "Amy Winehouse", "genre": "Soul", "format": "CD", "total_copies": 4},
-    {"title": "Random Access Memories", "artist": "Daft Punk", "genre": "Electronic", "format": "CD", "total_copies": 1},
+discos = [
+    {"titulo": "Abbey Road", "artista": "The Beatles", "genero": "Rock", "anio_lanzamiento": 1969, "stock_total": 3},
+    {"titulo": "Thriller", "artista": "Michael Jackson", "genero": "Pop", "anio_lanzamiento": 1982, "stock_total": 5},
+    {"titulo": "Rumours", "artista": "Fleetwood Mac", "genero": "Rock", "anio_lanzamiento": 1977, "stock_total": 2},
+    {"titulo": "Back to Black", "artista": "Amy Winehouse", "genero": "Soul", "anio_lanzamiento": 2006, "stock_total": 4},
+    {"titulo": "Random Access Memories", "artista": "Daft Punk", "genero": "Electronic", "anio_lanzamiento": 2013, "stock_total": 1},
 ]
 
-# NOTE: adjust these field names if your Member schema differs from this guess
-# (name, email, active) — check your app/schemas/member.py to confirm.
-members = [
-    {"name": "Ana Torres", "email": "ana.torres@example.com", "active": True},
-    {"name": "Carlos Ruiz", "email": "carlos.ruiz@example.com", "active": True},
-    {"name": "Beatriz Gomez", "email": "beatriz.gomez@example.com", "active": False},
+clientes = [
+    {"nombre": "Ana Torres", "email": "ana.torres@example.com", "telefono": "3001234567"},
+    {"nombre": "Carlos Ruiz", "email": "carlos.ruiz@example.com", "telefono": "3007654321"},
+    {"nombre": "Beatriz Gomez", "email": "beatriz.gomez@example.com", "telefono": "3009998888"},
 ]
+
+
+def unwrap(resp_json: dict) -> dict:
+    """Pulls id + attributes out of a JSON:API single-resource response."""
+    data = resp_json["data"]
+    return {"id": data["id"], **data["attributes"]}
+
+
+def unwrap_error(resp) -> str:
+    try:
+        return resp.json()["errors"][0]["detail"]
+    except Exception:
+        return resp.text
 
 
 def seed():
-    disc_ids = []
-    print("Creating discs...")
-    for d in discs:
-        resp = requests.post(f"{BASE_URL}/discs", json=d)
+    disco_ids = []
+    print("Creando discos...")
+    for d in discos:
+        resp = requests.post(f"{BASE_URL}/discos/", json=d)
         if resp.status_code == 201:
-            created = resp.json()
-            disc_ids.append(created["id"])
-            print(f"  OK: {d['title']} -> id {created['id']}")
+            created = unwrap(resp.json())
+            disco_ids.append(created["id"])
+            print(f"  OK: {d['titulo']} -> id {created['id']}")
         else:
-            print(f"  FAILED ({resp.status_code}) for {d['title']}: {resp.text}")
+            print(f"  FALLO ({resp.status_code}) para {d['titulo']}: {unwrap_error(resp)}")
 
-    member_ids = []
-    print("\nCreating members...")
-    for m in members:
-        resp = requests.post(f"{BASE_URL}/members", json=m)
+    cliente_ids = []
+    print("\nCreando clientes...")
+    for c in clientes:
+        resp = requests.post(f"{BASE_URL}/clientes/", json=c)
         if resp.status_code == 201:
-            created = resp.json()
-            member_ids.append(created["id"])
-            print(f"  OK: {m['name']} -> id {created['id']}")
+            created = unwrap(resp.json())
+            cliente_ids.append(created["id"])
+            print(f"  OK: {c['nombre']} -> id {created['id']} (estado: {created['estado']})")
         else:
-            print(f"  FAILED ({resp.status_code}) for {m['name']}: {resp.text}")
-    if len(member_ids) >= 3:
-        print("\nDeactivating Beatriz Gomez to test the inactive-member path...")
-        resp = requests.patch(f"{BASE_URL}/members/{member_ids[2]}/deactivate")
-        print(f"  Status {resp.status_code}: {resp.json()}")
-    if disc_ids and member_ids:
-        print("\nCreating a sample loan (first active member borrows first disc)...")
-        loan_payload = {"disc_id": disc_ids[0], "member_id": member_ids[0]}
-        resp = requests.post(f"{BASE_URL}/loans", json=loan_payload)
+            print(f"  FALLO ({resp.status_code}) para {c['nombre']}: {unwrap_error(resp)}")
+
+    if len(cliente_ids) >= 3:
+        print("\nDesactivando a Beatriz Gomez para probar la ruta de cliente inactivo...")
+        resp = requests.patch(f"{BASE_URL}/clientes/{cliente_ids[2]}/desactivar")
+        if resp.status_code == 200:
+            print(f"  OK: {unwrap(resp.json())}")
+        else:
+            print(f"  FALLO ({resp.status_code}): {unwrap_error(resp)}")
+
+    if disco_ids and cliente_ids:
+        print("\nCreando una renta de ejemplo (cliente activo, disco con stock)...")
+        resp = requests.post(f"{BASE_URL}/rentas/", json={"cliente_id": cliente_ids[0], "disco_id": disco_ids[0]})
         if resp.status_code == 201:
-            print(f"  OK: loan created -> {resp.json()}")
+            print(f"  OK: renta creada -> {unwrap(resp.json())}")
         else:
-            print(f"  FAILED ({resp.status_code}): {resp.text}")
+            print(f"  FALLO ({resp.status_code}): {unwrap_error(resp)}")
 
-        print("\nTrying a loan for the inactive member (should fail with 403/409)...")
-        bad_payload = {"disc_id": disc_ids[1], "member_id": member_ids[2]}
-        resp = requests.post(f"{BASE_URL}/loans", json=bad_payload)
-        print(f"  Got status {resp.status_code}: {resp.text}")
+        print("\nIntentando una renta con el cliente inactivo (debe fallar con 403)...")
+        resp = requests.post(f"{BASE_URL}/rentas/", json={"cliente_id": cliente_ids[2], "disco_id": disco_ids[1]})
+        print(f"  Status {resp.status_code}: {unwrap_error(resp) if resp.status_code >= 400 else unwrap(resp.json())}")
 
-    print("\nDone. Check http://localhost:8000/docs -> GET /discs and GET /members to confirm.")
+    print("\nListo. Revisa http://localhost:8000/docs -> GET /discos/ y GET /clientes/ para confirmar.")
 
 
 if __name__ == "__main__":

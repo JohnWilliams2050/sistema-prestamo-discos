@@ -1,0 +1,2 @@
+class PersistenciaNoDisponibleError(Exception):
+    pass

@@ -1,29 +1,45 @@
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
-from app.api import discs, members, loans
-from app.services.disc_service import DiscNotFoundError, DiscUnavailableError
-from app.services.member_service import MemberNotFoundError, MemberInactiveError
+from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
+from app.api import discos, clientes, rentas
+from app.services.disco_service import DiscoNoEncontradoError, DiscoNoDisponibleError
+from app.services.cliente_service import ClienteNoEncontradoError, ClienteInactivoError
+from app.core.database import crear_indices
+from app.core.jsonapi import JSONAPIResponse, errors
 
-app = FastAPI(title="Music Disc Loan System")
-app.include_router(discs.router)
-app.include_router(members.router)
-app.include_router(loans.router)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await crear_indices()
+    yield
 
-@app.exception_handler(DiscNotFoundError)
-async def disc_not_found_handler(request, exc):
-    return JSONResponse(status_code=404, content={"detail": "Disc not found"})
+app = FastAPI(title="Sistema de Renta de Discos", lifespan=lifespan, default_response_class=JSONAPIResponse)
 
-@app.exception_handler(DiscUnavailableError)
-async def disc_unavailable_handler(request, exc):
-    return JSONResponse(status_code=409, content={"detail": "No copies available"})
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:4200"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.exception_handler(MemberNotFoundError)
-async def member_not_found_handler(request, exc):
-    return JSONResponse(status_code=404, content={"detail": "Member not found"})
+app.include_router(discos.router)
+app.include_router(clientes.router)
+app.include_router(rentas.router)
 
-@app.exception_handler(MemberInactiveError)
-async def member_inactive_handler(request, exc):
-    return JSONResponse(status_code=403, content={"detail": "Member is not active"})
+@app.exception_handler(DiscoNoEncontradoError)
+async def disco_no_encontrado_handler(request, exc):
+    return JSONAPIResponse(status_code=404, content=errors(404, "Disco no encontrado", str(exc)))
+
+@app.exception_handler(DiscoNoDisponibleError)
+async def disco_no_disponible_handler(request, exc):
+    return JSONAPIResponse(status_code=409, content=errors(409, "Sin stock disponible", "El disco no tiene copias disponibles"))
+
+@app.exception_handler(ClienteNoEncontradoError)
+async def cliente_no_encontrado_handler(request, exc):
+    return JSONAPIResponse(status_code=404, content=errors(404, "Cliente no encontrado", str(exc)))
+
+@app.exception_handler(ClienteInactivoError)
+async def cliente_inactivo_handler(request, exc):
+    return JSONAPIResponse(status_code=403, content=errors(403, "Cliente inactivo", "El cliente no está activo"))
 
 @app.get("/health")
 async def health():
