@@ -1,1 +1,90 @@
-<p>loan-form works!</p>
+<main class="pagina-prestamo">
+	@if (loadingDisc()) {
+		<p class="mensaje-estado" role="status">Cargando el disco seleccionado…</p>
+	} @else if (loan(); as completedLoan) {
+		<section class="panel-prestamo panel-exito" aria-live="polite">
+			<p class="etiqueta-superior">Préstamo creado</p>
+			<h1>Todo listo, {{ member()?.nombre }}.</h1>
+			<p>La fecha de devolución de <strong>{{ disc()?.titulo }}</strong> es el
+				<strong>{{ formatearFechaDevolucion(completedLoan.fecha_limite_devolucion) }}</strong>.
+			</p>
+			<a class="enlace-texto" routerLink="/discs-list">Volver al catálogo</a>
+		</section>
+	} @else if (disc(); as selectedDisc) {
+		<section class="panel-prestamo">
+			<a class="enlace-volver" routerLink="/discs-list">← Todos los discos</a>
+			<header class="disco-seleccionado">
+				<p class="etiqueta-superior">Disco seleccionado</p>
+				<h1>{{ selectedDisc.titulo }}</h1>
+				<p>{{ selectedDisc.artista }} · {{ selectedDisc.genero }} ·
+					{{ selectedDisc.anio_lanzamiento ?? 'Año desconocido' }}</p>
+				<span>{{ selectedDisc.stock_disponible }} de {{ selectedDisc.stock_total }} disponibles</span>
+				<label for="disco-seleccionado">Disco</label>
+				<input id="disco-seleccionado" [value]="selectedDisc.titulo + ' — ' + selectedDisc.artista" readonly>
+			</header>
+
+			@if (error()) {
+				<p class="mensaje-error" role="alert">{{ error() }}</p>
+			}
+
+			<section class="seccion-formulario">
+				<h2>Cuenta del cliente</h2>
+					<form class="fila-busqueda" (ngSubmit)="buscarCliente()">
+					<label for="correo-cliente">Correo electrónico</label>
+					<div class="controles-en-linea">
+						<input id="correo-cliente" name="correoCliente" type="email" required email
+							[(ngModel)]="email" placeholder="nombre@ejemplo.com">
+						<button class="boton boton-secundario" type="submit" [disabled]="lookupLoading()">
+							{{ lookupLoading() ? 'Buscando…' : 'Buscar' }}
+						</button>
+						<button class="boton boton-texto" type="button" (click)="marcarNoCliente()">
+							No es cliente
+						</button>
+					</div>
+				</form>
+
+				@if (member(); as foundMember) {
+					<div class="resultado-cliente">
+						<div>
+							<strong>{{ foundMember.nombre }}</strong>
+							<span>{{ foundMember.email }}{{ foundMember.telefono ? ' · ' + foundMember.telefono : '' }}</span>
+							<span class="estado-cuenta" [class.inactivo]="foundMember.estado === 'inactivo'">
+								{{ foundMember.estado }}
+							</span>
+						</div>
+						<button class="boton boton-secundario" type="button" (click)="cambiarEstadoCliente()">
+							{{ foundMember.estado === 'activo' ? 'Desactivar cuenta' : 'Activar cuenta' }}
+						</button>
+					</div>
+					@if (foundMember.estado === 'activo') {
+						<button class="boton boton-principal boton-prestamo" type="button"
+							[disabled]="submitting() || selectedDisc.stock_disponible < 1" (click)="crearPrestamo()">
+							{{ submitting() ? 'Creando préstamo…' : 'Crear préstamo' }}
+						</button>
+					}
+				}
+
+				@if (notMember()) {
+					<form class="formulario-registro" #formularioRegistro="ngForm" (ngSubmit)="registrarCliente()">
+						<h3>Registrar nuevo cliente</h3>
+						<label for="nombre-cliente">Nombre completo</label>
+						<input id="nombre-cliente" name="nombreCliente" required [(ngModel)]="newMember.nombre">
+						<label for="nuevo-correo-cliente">Correo electrónico</label>
+						<input id="nuevo-correo-cliente" name="nuevoCorreoCliente" type="email" required email
+							[(ngModel)]="newMember.email">
+						<label for="telefono-cliente">Teléfono <span>(opcional)</span></label>
+						<input id="telefono-cliente" name="telefonoCliente" type="tel" [(ngModel)]="newMember.telefono">
+						<button class="boton boton-principal" type="submit" [disabled]="formularioRegistro.invalid">
+							Registrar cliente
+						</button>
+					</form>
+				}
+			</section>
+		</section>
+	} @else {
+		<section class="panel-prestamo">
+			<p class="mensaje-error" role="alert">{{ error() || 'No se encontró el disco seleccionado.' }}</p>
+			<a class="enlace-texto" routerLink="/discs-list">Volver al catálogo de discos</a>
+		</section>
+	}
+</main>

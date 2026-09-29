@@ -1,9 +1,9 @@
 export interface Disc {
   id: string;
-  title: string;
-  artist: string;
-  genre: string;
-  format: string;
-  total_copies: number;
-  available_copies: number;
+  titulo: string;
+  artista: string;
+  genero: string;
+  anio_lanzamiento: number | null;
+  stock_total: number;
+  stock_disponible: number;
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { DiscService } from '../../../core/services/disc';
 import { Disc } from '../../../models/disc';
 import { Router } from '@angular/router';
@@ -10,12 +10,17 @@ import { Router } from '@angular/router';
   templateUrl: './disc-list.html',
 })
 export class DiscList {
-  discs: Disc[] = [];
+  discs = signal<Disc[]>([]);
 
-  constructor(private discService: DiscService, public router: Router) {}
-  ngOnInit(){
+  constructor(private discService: DiscService, private router: Router) {}
+
+  ngOnInit() {
     this.discService.list().subscribe((discs: Disc[]) => {
-      this.discs = discs;
+      this.discs.set(discs);
     });
+  }
+
+  seleccionarDisco(disc: Disc) {
+    this.router.navigate(['/loans', disc.id]);
   }
 }

@@ -1,0 +1,204 @@
+.pagina-prestamo {
+	display: grid;
+	min-height: 100vh;
+	min-height: 100dvh;
+	box-sizing: border-box;
+	place-items: center;
+	padding: 3rem 1rem;
+	background-color: #f2f4f1;
+	background-image: radial-gradient(#dce3dc 0.7px, transparent 0.7px);
+	background-size: 18px 18px;
+}
+
+@media (max-height: 760px) {
+		.pagina-prestamo {
+		place-items: start center;
+	}
+}
+
+.panel-prestamo {
+	width: min(100%, 42rem);
+	padding: clamp(1.25rem, 4vw, 2.5rem);
+	border: 1px solid #d7ddd6;
+	border-radius: 6px;
+	background: #fff;
+	box-shadow: 0 16px 45px rgb(27 55 41 / 8%);
+	animation: entrada-panel 220ms ease-out both;
+}
+
+.enlace-volver,
+.enlace-texto {
+	color: #28674d;
+	font-weight: 650;
+	text-decoration: none;
+}
+
+.disco-seleccionado {
+	padding: 1.5rem 0;
+	border-bottom: 1px solid #e3e7e2;
+}
+
+.etiqueta-superior {
+	margin: 0 0 0.4rem;
+	color: #28674d;
+	font-size: 0.75rem;
+	font-weight: 700;
+	text-transform: uppercase;
+}
+
+.disco-seleccionado h1,
+.panel-exito h1 {
+	margin: 0;
+	font-size: 1.75rem;
+}
+
+.disco-seleccionado p:not(.etiqueta-superior) {
+	margin: 0.4rem 0;
+	color: #58615b;
+}
+
+.disco-seleccionado span,
+.resultado-cliente span {
+	color: #58615b;
+	font-size: 0.9rem;
+}
+
+.seccion-formulario {
+	padding-top: 1.5rem;
+}
+
+.seccion-formulario h2 {
+	margin: 0 0 1rem;
+	font-size: 1.2rem;
+}
+
+.fila-busqueda label,
+.formulario-registro label {
+	display: block;
+	margin: 0.75rem 0 0.35rem;
+	font-size: 0.875rem;
+	font-weight: 650;
+}
+
+.controles-en-linea {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+input {
+	min-width: 0;
+	padding: 0.7rem 0.75rem;
+	border: 1px solid #bfc8c0;
+	border-radius: 4px;
+	font: inherit;
+}
+
+.controles-en-linea input {
+	flex: 1 1 14rem;
+}
+
+.boton {
+	min-height: 2.65rem;
+	padding: 0.6rem 0.9rem;
+	border: 1px solid transparent;
+	border-radius: 4px;
+	font: inherit;
+	font-weight: 650;
+	cursor: pointer;
+}
+
+.boton:disabled {
+	cursor: not-allowed;
+	opacity: 0.55;
+}
+
+.boton-principal {
+	background: #28674d;
+	color: #fff;
+}
+
+.boton-secundario {
+	border-color: #bfc8c0;
+	background: #fff;
+	color: #25352b;
+}
+
+.boton-texto {
+	background: transparent;
+	color: #28674d;
+}
+
+.resultado-cliente {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-top: 1.25rem;
+	padding: 1rem;
+	border: 1px solid #d7ddd6;
+	border-radius: 4px;
+}
+
+.resultado-cliente > div {
+	display: grid;
+	gap: 0.25rem;
+}
+
+.estado-cuenta {
+	color: #28674d !important;
+	text-transform: capitalize;
+}
+
+.estado-cuenta.inactivo {
+	color: #a43e2c !important;
+}
+
+.boton-prestamo {
+	width: 100%;
+	margin-top: 1rem;
+}
+
+.formulario-registro {
+	display: grid;
+	gap: 0.25rem;
+	margin-top: 1.5rem;
+	padding-top: 1.25rem;
+	border-top: 1px solid #e3e7e2;
+}
+
+.formulario-registro h3 {
+	margin: 0 0 0.5rem;
+}
+
+.formulario-registro label span {
+	color: #58615b;
+	font-weight: 400;
+}
+
+.formulario-registro .boton {
+	margin-top: 0.75rem;
+}
+
+.mensaje-error {
+	margin: 1rem 0;
+	padding: 0.75rem;
+	border-left: 3px solid #a43e2c;
+	background: #fff3ef;
+	color: #762d20;
+}
+
+.panel-exito > p:not(.etiqueta-superior) {
+	margin: 1rem 0 1.5rem;
+	line-height: 1.6;
+}
+
+@keyframes entrada-panel {
+	from { opacity: 0; transform: translateY(8px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.panel-prestamo { animation: none; }
+}

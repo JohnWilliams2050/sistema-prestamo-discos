@@ -1,9 +1,14 @@
-<p>disc-list works!</p>
-<section class="disc-list">
-  @for (disc of discs; track disc.id) {
-    <div class="disc-item" (click)="router.navigate(['/discs', disc.id])">
-    <h3>{{ disc.title }}</h3>
-    <p>{{ disc.artist }}</p>
-    </div>
+<section class="lista-discos">
+  @for (disc of discs(); track disc.id) {
+    <button class="tarjeta-disco" type="button" (click)="seleccionarDisco(disc)">
+      <span class="genero-disco">{{ disc.genero }}</span>
+      <h2>{{ disc.titulo }}</h2>
+      <p class="artista-disco">{{ disc.artista }}</p>
+      <dl>
+        <div><dt>Año de lanzamiento</dt><dd>{{ disc.anio_lanzamiento ?? 'Desconocido' }}</dd></div>
+        <div><dt>Disponibles</dt><dd>{{ disc.stock_disponible }} / {{ disc.stock_total }}</dd></div>
+      </dl>
+      <span class="etiqueta-seleccion">Seleccionar disco <span aria-hidden="true">→</span></span>
+    </button>
   }
 </section>
