@@ -1,0 +1,9 @@
+<p>disc-list works!</p>
+<section class="disc-list">
+  @for (disc of discs; track disc.id) {
+    <div class="disc-item" (click)="router.navigate(['/discs', disc.id])">
+    <h3>{{ disc.title }}</h3>
+    <p>{{ disc.artist }}</p>
+    </div>
+  }
+</section>
