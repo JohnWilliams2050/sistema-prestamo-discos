@@ -79,3 +79,7 @@ Para eliminar también los datos almacenados en MongoDB:
 ```bash
 docker compose down -v
 ```
+
+### Acceder los documentos relacionados al projecto
+
+Todos los documentos relacionados a la investigacion para el projecto se encuentra en el Wiki o en la carpeta Documents.
