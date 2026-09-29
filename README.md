@@ -6,12 +6,12 @@ Aplicación para gestionar el préstamo de discos musicales a clientes, con cont
 
 El sistema permite:
 
-- Registrar discos en el catálogo, indicando título, artista, género y cantidad de copias disponibles.
+- Visualizar discos en el catálogo, mostrando título, artista, género y cantidad de copias disponibles.
 - Registrar clientes mediante nombre, correo electrónico y teléfono.
 - Consultar si un correo ya pertenece a un cliente existente, evitando exponer un listado completo de clientes por razones de privacidad.
 - Crear una renta asociando un cliente activo a un disco con stock disponible.
-- Rechazar una renta de forma controlada cuando el disco no tiene copias disponibles (409) o cuando el cliente está inactivo (403).
-- Activar o desactivar clientes como una operación administrativa independiente del flujo de renta.
+- Rechazar una renta de forma controlada cuando el disco no tiene copias disponibles o cuando el cliente está inactivo.
+- Activar o desactivar clientes.
 
 El flujo principal —seleccionar un disco, confirmar la renta y recibir una confirmación con la fecha límite de devolución— está implementado de extremo a extremo: desde el formulario en Angular hasta el documento persistido en MongoDB.
 
@@ -33,7 +33,7 @@ La arquitectura organiza estas tecnologías en cuatro capas: presentación (Angu
 ### Requisitos previos
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado, con virtualización habilitada en el sistema.
-- Git (opcional, solo para clonar el repositorio).
+- Git para clonar el repositorio.
 
 No es necesario instalar Python, Node.js o MongoDB de forma local: todo se ejecuta dentro de los contenedores.
 
@@ -59,9 +59,9 @@ Este comando construye las imágenes del backend y el frontend, descarga la imag
 
 MongoDB no expone ningún puerto hacia el host por diseño: solo es accesible desde el contenedor del backend, como parte de la estrategia de aislamiento de la capa de datos.
 
-### 4. (Opcional) Cargar datos de ejemplo
+### 4. Cargar datos de ejemplo
 
-El repositorio incluye un script en `scripts/seed_data.py` que crea discos y clientes de ejemplo a través de la API, útil para probar el sistema sin llenar los formularios manualmente.
+El repositorio incluye un script en `scripts/seed_data.py` que crea discos y clientes de ejemplo a través de la API.
 
 ```bash
 pip install requests
