@@ -1,4 +1,4 @@
-# Sistema de Renta de Discos Musicales
+# Sistema de Renta de Discos de Musica
 
 Aplicación para gestionar el préstamo de discos musicales a clientes, con control de inventario y validaciones de negocio (disponibilidad de stock y estado del cliente). El sistema está construido siguiendo el estilo arquitectónico de **Arquitectura en Capas (Layered Architecture)**, separando la presentación, la lógica de negocio, el acceso a datos y la persistencia en componentes independientes.
 
